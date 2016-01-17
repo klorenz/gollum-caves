@@ -1,0 +1,22 @@
+.CodeMirror pre{
+  line-height: 16px;
+}
+
+.CodeMirror {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+}
+
+.CodeMirror-scroll {
+  padding: 1em;
+  box-sizing: border-box;
+}
+
+.CodeMirror-vscrollbar, .CodeMirror-hscrollbar {
+  background-color: #F0F0F0;
+}

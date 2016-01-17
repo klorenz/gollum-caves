@@ -1,3 +1,5 @@
-gollum
-wiki
-wiki-templates
+/gollum
+/gollum-lib*
+/wiki
+/wiki-templates
+/node_modules
