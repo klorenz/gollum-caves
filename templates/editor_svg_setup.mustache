@@ -1,0 +1,51 @@
+
+<link rel="stylesheet" href="{{base_url}}/gollum-caves/javascript/svg-edit/jgraduate/css/jPicker.css" type="text/css"/>
+<link rel="stylesheet" href="{{base_url}}/gollum-caves/javascript/svg-edit/jgraduate/css/jgraduate.css" type="text/css"/>
+<link rel="stylesheet" href="{{base_url}}/gollum-caves/javascript/svg-edit/svg-editor.css" type="text/css"/>
+<link rel="stylesheet" href="{{base_url}}/gollum-caves/javascript/svg-edit/spinbtn/JQuerySpinBtn.css" type="text/css"/>
+<link rel="stylesheet" href="{{base_url}}/gollum-caves/javascript/svg-edit/custom.css" type="text/css"/>
+
+<!-- jquery.js -->
+
+<script src="{{base_url}}/gollum-caves/javascript/svg-edit/js-hotkeys/jquery.hotkeys.min.js"></script>
+<script src="{{base_url}}/gollum-caves/javascript/svg-edit/jquerybbq/jquery.bbq.min.js"></script>
+<script src="{{base_url}}/gollum-caves/javascript/svg-edit/svgicons/jquery.svgicons.js"></script>
+<script src="{{base_url}}/gollum-caves/javascript/svg-edit/jgraduate/jquery.jgraduate.min.js"></script>
+<script src="{{base_url}}/gollum-caves/javascript/svg-edit/spinbtn/JQuerySpinBtn.min.js"></script>
+<script src="{{base_url}}/gollum-caves/javascript/svg-edit/touch.js"></script>
+
+<script src="{{base_url}}/gollum-caves/javascript/svg-edit/svgedit.compiled.js"></script>
+
+<script src="{{base_url}}/gollum-caves/javascript/svg-edit/jquery-ui/jquery-ui-1.8.17.custom.min.js"></script>
+<script src="{{base_url}}/gollum-caves/javascript/svg-edit/jgraduate/jpicker.js"></script>
+
+{{! SVG Editor config goes here, see svg-edit/config-sample.js}}
+<script>
+  svgEditor.setConfig({
+    imgPath: "{{base_url}}/gollum-caves/javascript/svg-edit/images/",
+    langPath: "{{base_url}}/gollum-caves/javascript/svg-edit/locale/",
+    extPath: "{{base_url}}/gollum-caves/javascript/svg-edit/extensions/",
+    jGraduatePath: "{{base_url}}/gollum-caves/javascript/svg-edit/jgraduate/images/",
+  });
+
+  svgEditor.setCustomHandlers({
+    'save': function(win, svg) {
+      svg = '<?xml version="1.0"?>\n' + svg;
+
+      $('#svg_source_textarea').val(svg);
+      var val = $("#svg_editor_filename").val();
+      if (val) {
+        $('#svg_source_page').val(val);
+      }
+
+      $('#gollum-editor-svg').submit();
+    }
+  });
+
+  $(function(){
+    svgEditor.loadFromString($('#svg_source_textarea').val());
+  });
+
+</script>
+
+<script src="{{base_url}}/gollum-caves/javascript/svg-edit/config.js"></script>

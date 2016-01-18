@@ -59,7 +59,13 @@
   }(document));
   </script>{{/mathjax}}
 
-  {{>markdown_it_setup}}
+  {{#editor_markdown}}
+     {{>markdown_it_setup}}
+  {{/editor_markdown}}
+
+  {{#editor_svg}}
+    {{>editor_svg_setup}}
+  {{/editor_svg}}
 
   {{#js}}<script type="text/javascript" src="{{custom_path}}/custom.js"></script>{{/js}}
 
