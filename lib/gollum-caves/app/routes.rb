@@ -92,6 +92,23 @@ module Valuable
       end
     end
 
+    get '/wiki-create/:coll/:wiki' do
+      # forbid unless @allow_manage_wiki(params[:coll])
+      # wiki_dir = ::File.join(settings.gollum_path, params[:coll], params[:wiki])
+      # output = `mkdir -p #{wiki_dir} ; cd #{wiki_dir} ; git init`
+      #
+      # mustache :created_wiki
+      # #redirect to("/wiki/me/manage-wiki?wiki=#{params[:coll]}/#{params[:wiki]}")
+    end
+
+    get '/wiki-fork/:coll/:wiki' do
+#      forbid unless @allow_read_wiki(params[:coll], params[:wiki])
+    end
+
+    get '/wiki-rename/:src_coll/:src_wiki/to/:dst_coll/:src' do
+#      forbid unless @allow_read_wiki(params[:coll], params[:wiki])
+    end
+
     get '/create/*' do
       forbid unless @allow_editing
       @filename = params[:splat].first.gsub('+', '-')
@@ -231,6 +248,7 @@ module Valuable
       mustache :pages
     end
 
+
     get '/pages/:coll/:wiki' do
       redirect to("/pages/#{params[:coll]}/#{params[:wiki]}/")
     end
@@ -238,9 +256,11 @@ module Valuable
     post '/create' do
       name   = params[:page].to_url
       path   = sanitize_empty_params(params[:path]) || ''
+
       format = params[:format].to_s
+
       wikip  = wiki_page(name, path)
-      wiki   = wiki_new(wikip.collection, wikip.wikiname)
+      wiki   = wikip.wiki
       path   = wikip.path
 
       puts "1 name: '#{name}'"
