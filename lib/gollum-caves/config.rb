@@ -84,4 +84,6 @@ Precious::App.set(:wiki_options, {
 #    :css => true,
     :repo_is_bare => false,
     :template_dir => "templates",
+    :allow_uploads => true,
+    :per_page_uploads => true
 })

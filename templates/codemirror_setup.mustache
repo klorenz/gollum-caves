@@ -67,6 +67,8 @@
 
     editor.on('change', update);
 
+    window.sourceEditor = editor;
+
     document.addEventListener('drop', function(e){
       e.preventDefault();
       e.stopPropagation();
@@ -79,57 +81,57 @@
       reader.readAsText(e.dataTransfer.files[0]);
     }, false);
 
-    function saveAsMarkdown(){
-      save(editor.getValue(), "untitled.md");
-    }
+    // function saveAsMarkdown(){
+    //   save(editor.getValue(), "untitled.md");
+    // }
+    //
+    // function saveAsHtml() {
+    //   save(document.getElementById('out').innerHTML, "untitled.html");
+    // }
+    //
+    // document.getElementById('saveas-markdown').addEventListener('click', function() {
+    //   saveAsMarkdown();
+    //   hideMenu();
+    // });
+    //
+    // document.getElementById('saveas-html').addEventListener('click', function() {
+    //   saveAsHtml();
+    //   hideMenu();
+    // });
+    //
+    // function save(code, name){
+    //   var blob = new Blob([code], { type: 'text/plain' });
+    //   if(window.saveAs){
+    //     window.saveAs(blob, name);
+    //   }else if(navigator.saveBlob){
+    //     navigator.saveBlob(blob, name);
+    //   }else{
+    //     url = URL.createObjectURL(blob);
+    //     var link = document.createElement("a");
+    //     link.setAttribute("href",url);
+    //     link.setAttribute("download",name);
+    //     var event = document.createEvent('MouseEvents');
+    //     event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+    //     link.dispatchEvent(event);
+    //   }
+    // }
 
-    function saveAsHtml() {
-      save(document.getElementById('out').innerHTML, "untitled.html");
-    }
+    // var menuVisible = false;
+    // var menu = document.getElementById('menu');
 
-    document.getElementById('saveas-markdown').addEventListener('click', function() {
-      saveAsMarkdown();
-      hideMenu();
-    });
-
-    document.getElementById('saveas-html').addEventListener('click', function() {
-      saveAsHtml();
-      hideMenu();
-    });
-
-    function save(code, name){
-      var blob = new Blob([code], { type: 'text/plain' });
-      if(window.saveAs){
-        window.saveAs(blob, name);
-      }else if(navigator.saveBlob){
-        navigator.saveBlob(blob, name);
-      }else{
-        url = URL.createObjectURL(blob);
-        var link = document.createElement("a");
-        link.setAttribute("href",url);
-        link.setAttribute("download",name);
-        var event = document.createEvent('MouseEvents');
-        event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-        link.dispatchEvent(event);
-      }
-    }
-
-    var menuVisible = false;
-    var menu = document.getElementById('menu');
-
-    function showMenu() {
-      menuVisible = true;
-      menu.style.display = 'block';
-    }
-
-    function hideMenu() {
-      menuVisible = false;
-      menu.style.display = 'none';
-    }
-
-    document.getElementById('close-menu').addEventListener('click', function(){
-      hideMenu();
-    });
+    // function showMenu() {
+    //   menuVisible = true;
+    //   menu.style.display = 'block';
+    // }
+    //
+    // function hideMenu() {
+    //   menuVisible = false;
+    //   menu.style.display = 'none';
+    // }
+    //
+    // document.getElementById('close-menu').addEventListener('click', function(){
+    //   hideMenu();
+    // });
 
     document.addEventListener('keydown', function(e){
       if(e.keyCode == 83 && (e.ctrlKey || e.metaKey)){

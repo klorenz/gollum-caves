@@ -14,12 +14,14 @@
   {{#css}}<link rel="stylesheet" type="text/css" href="{{custom_path}}/custom.css" media="all">{{/css}}
   {{#noindex}}<meta name="robots" content="noindex, nofollow" />{{/noindex}}
 
+
   <!--[if IE 7]>
   <link rel="stylesheet" type="text/css" href="{{base_url}}/css/ie7.css" media="all">
   <![endif]-->
 
   <script>
       var baseUrl = '{{base_url}}';
+      var wikiPath = '{{wikipath}}';
       var uploadDest   = '{{upload_dest}}';
       {{#page}}
       var pageFullPath = '{{url_path_display}}';
@@ -27,12 +29,18 @@
   </script>
   <script type="text/javascript" src="{{base_url}}/javascript/jquery-1.7.2.min.js"></script>
   <script type="text/javascript" src="{{base_url}}/javascript/mousetrap.min.js"></script>
-<!--
-  <script type="text/javascript" src="{{base_url}}/javascript/gollum.js"></script>
-  <script type="text/javascript" src="{{base_url}}/javascript/gollum.dialog.js"></script>
+
+  <script type="text/javascript" src="{{base_url}}/gollum-caves/javascript/gollum.js"></script>
+  <script type="text/javascript" src="{{base_url}}/gollum-caves/javascript/gollum.dialog.js"></script>
   <script type="text/javascript" src="{{base_url}}/javascript/gollum.placeholder.js"></script>
+<!--
   <script type="text/javascript" src="{{base_url}}/javascript/editor/gollum.editor.js"></script>
 -->
+  <style>
+    #gollum-dialog-dialog-inner {
+      min-height: initial;
+    }
+  </style>
   {{#use_identicon}}
   <script type="text/javascript" src="{{base_url}}/javascript/identicon_canvas.js"></script>
   {{/use_identicon}}
@@ -62,6 +70,7 @@
   {{#editor_markdown}}
      {{>markdown_it_setup}}
      {{>codemirror_setup}}
+     {{>editor_ck_setup}}
   {{/editor_markdown}}
 
   {{#editor_svg}}

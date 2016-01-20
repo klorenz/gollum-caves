@@ -19,5 +19,13 @@ init-bare:
 	git init --bare wiki/wiki/home.git
 	git init --bare wiki/wiki/skeleton.git
 
+glyphs:
+	fontello-cli install --config public/gollum-caves/fonts/config.json \
+	--font public/gollum-caves/fonts/ --css public/gollum-caves/css/
+
+open-fontello:
+	fontello-cli open --config public/gollum-caves/fonts/config.json
+
+
 serve:
 	rackup config.ru

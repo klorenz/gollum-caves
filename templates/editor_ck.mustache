@@ -1,50 +1,38 @@
-<div id="gollum-editor" data-escaped-name="{{escaped_name}}" class="{{#is_create_page}}create{{/is_create_page}}{{#is_edit_page}}edit{{/is_edit_page}} {{#allow_uploads}}uploads-allowed{{/allow_uploads}}">
-{{#is_create_page}}
-<form name="gollum-editor" action="{{base_url}}/create" method="post">
-{{/is_create_page}}
-{{#is_edit_page}}
-<form name="gollum-editor" action="{{base_url}}/edit/{{escaped_name}}" method="post">
-{{/is_edit_page}}
-  <fieldset id="gollum-editor-fields">
-  {{#is_create_page}}
-  <div id="gollum-editor-title-field" class="singleline">
-    <label for="page" class="jaws">Page Title</label>
-    <input type="text" name="page" id="gollum-editor-page-title" value="{{page_name}}">
-    {{#has_path}}
-    <p class="path_note"><strong>NOTE:</strong> This page will be created within the &quot;<strong>{{path}}</strong>&quot; directory</p>
-    {{/has_path}}
-  </div>
-  {{/is_create_page}}
-  {{#is_edit_page}}
-  <input type="hidden" name="page" id="gollum-editor-page-title" value="{{page_name}}">
-  {{/is_edit_page}}
-  <input type="hidden" name="path" id="gollum-editor-page-path" value="{{path}}">
-
-    <textarea id="gollum-editor-body"
-     data-markup-lang="{{format}}" name="content" class="mousetrap">{{content}}</textarea>
-
-    <script>
+<script>
       // Replace the <textarea id="editor1"> with a CKEditor
       // instance, using default configuration.
       $(function(){
-        // $('#gollum-editor-body').val(marked($('#gollum-editor-body').val(), {langPrefix: 'language-'}));
+        CKEDITOR.on('dialogDefinition', function(ev){
+          var dialogName = ev.data.name;
+          var dialogDefinition = ev.data.definition;
+          debugger
 
-        CKEDITOR.replace( 'gollum-editor-body' , {
+        });
+        window.wysiwygEditor = CKEDITOR.replace( 'ckeditor-body' , {
           toolbarGroups: [
-              {name: 'tools'},
-              {name: 'links'},
-              {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-              {name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ]},
-              {name: 'document',   groups: [ 'mode' ]},
-              {name: 'styles'},
-              {name: 'others'}
+            { name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
+            { name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
+            { name: 'editing', groups: [ 'find', 'selection', 'spellchecker', 'editing' ] },
+            { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+            { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
+            { name: 'links', groups: [ 'links' ] },
+            { name: 'insert', groups: [ 'insert' ] },
+            { name: 'styles', groups: [ 'styles' ] },
+            { name: 'colors', groups: [ 'colors' ] },
+            { name: 'tools', groups: [ 'tools' ] },
+            { name: 'others', groups: [ 'others' ] },
+            { name: 'about', groups: [ 'about' ] }
           ],
-          extraPlugins: 'markdown',
-        }
-        );
-      })
-    </script>
-    <style>
+
+          height: '60vh',
+
+          removeButtons: 'Source,Save,NewPage,Preview,Print,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Flash,Smiley,PageBreak,Iframe,Styles,Font,FontSize,TextColor,BGColor'
+
+
+        });
+      });
+</script>
+<style>
       #gollum-editor-body + div {
         display: block;
       }
@@ -52,50 +40,4 @@
       #cke_gollum-editor-body + div {
         display: none ;
       }
-    </style>
-
-    <div>
-      <i class="fa fa-spinner fa-spin"></i>
-      Uploading file ...
-    </div>
-
-    {{#header}}
-    <div id="gollum-editor-edit-header" class="collapsed">
-      <a href="#" class="button"><span>Expand/Collapse</span></a>
-      <h4>Header</h4>
-      <textarea id="gollum-editor-header" name="header">{{header}}</textarea>
-    </div>
-    {{/header}}
-
-    {{#footer}}
-    <div id="gollum-editor-edit-footer" class="collapsed">
-      <a href="#" class="button"><span>Expand/Collapse</span></a>
-      <h4>Footer</h4>
-      <textarea id="gollum-editor-footer" name="footer">{{footer}}</textarea>
-    </div>
-    {{/footer}}
-
-    {{#sidebar}}
-    <div id="gollum-editor-edit-sidebar" class="collapsed">
-      <a href="#" class="button"><span>Expand/Collapse</span></a>
-      <h4>Sidebar</h4>
-      <textarea id="gollum-editor-sidebar" name="sidebar">{{sidebar}}</textarea>
-    </div>
-    {{/sidebar}}
-
-    <div id="gollum-editor-edit-summary" class="singleline">
-      <label for="message" class="jaws">Edit message:</label>
-      {{#is_create_page}}
-      <input type="text" name="message" id="gollum-editor-message-field" value="Created {{page_name}} ({{format}})">
-      {{/is_create_page}}
-      {{#is_edit_page}}
-      <input type="text" name="message" id="gollum-editor-message-field" value="Updated {{page_name}} ({{format}})">
-      {{/is_edit_page}}
-    </div>
-
-    <span class="jaws"><br></span>
-    <input type="submit" id="gollum-editor-submit" value="Save" title="Save current changes">
-    <a href="{{base_url}}/preview" id="gollum-editor-preview" class="minibutton" title="Preview this Page">Preview</a>
-  </fieldset>
-</form>
-</div>
+</style>

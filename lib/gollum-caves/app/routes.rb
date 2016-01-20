@@ -253,6 +253,55 @@ module Valuable
       redirect to("/pages/#{params[:coll]}/#{params[:wiki]}/")
     end
 
+    post '/uploadFile/:coll/:wiki' do
+      wiki = wiki_new(params[:coll], params[:wiki])
+
+      unless wiki.allow_uploads
+        @message = "File uploads are disabled"
+        mustache :error
+        return
+      end
+
+      if params[:file]
+        fullname = params[:file][:filename]
+        tempfile = params[:file][:tempfile]
+      end
+      halt 500 unless tempfile.is_a? Tempfile
+
+      # Remove page file dir prefix from upload path if necessary -- committer handles this itself
+      dir      = wiki.per_page_uploads ? params[:upload_dest].match(/^(#{wiki.page_file_dir}\/+)?(.*)/)[2] : 'uploads'
+      ext      = ::File.extname(fullname)
+      format   = ext.split('.').last || 'txt'
+      filename = ::File.basename(fullname, ext)
+      contents = ::File.read(tempfile)
+      reponame = filename + '.' + format
+
+      head = wiki.repo.head
+
+      options = {
+          :message => "Uploaded file to #{dir}/#{reponame}",
+          :parent  => wiki.repo.head.commit,
+      }
+      author  = session['gollum.author']
+      unless author.nil?
+        options.merge! author
+      end
+
+      begin
+        committer = Gollum::Committer.new(wiki, options)
+        committer.add_to_index(dir, filename, format, contents)
+        committer.after_commit do |committer, sha|
+          wiki.clear_cache
+          committer.update_working_dir(dir, filename, format)
+        end
+        committer.commit
+        redirect to(request.referer)
+      rescue Gollum::DuplicatePageError => e
+        @message = "Duplicate page: #{e.message}"
+        mustache :error
+      end
+    end
+
     post '/create' do
       name   = params[:page].to_url
       path   = sanitize_empty_params(params[:path]) || ''
