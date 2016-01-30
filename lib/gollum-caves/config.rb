@@ -5,7 +5,36 @@ Gollum::Page::FORMAT_NAMES = {
   :markdown => "Markdown"
 }
 
+
+# this is still original partial method, override this to search in
+# multiple paths for name
+class Mustache
+  def partial(name)
+    path = "#{template_path}/#{name}.#{template_extension}"
+
+    # file does not exist, check if name is a variable containing a name,
+    # which specifies another template
+    #
+    # <viewobject>.instance_variable_get("@#{name}")
+
+    begin
+      File.read(path)
+    rescue
+      raise if raise_on_context_miss?
+      ""
+    end
+  end
+end
+
 # require 'mustache/sinatra'
+
+# module Gollum
+#   class Page
+#     def settings_page
+#       #if @
+#   end
+# end
+
 
 
 require 'mustache'
@@ -27,12 +56,18 @@ require 'gollum-lib/filter'
 
 class Gollum::Filter::FrontMatter < Gollum::Filter
   def extract(data)
-    data.gsub(/^(?:(---|```)-yaml)\n(.*)^(\1)\n/m) do
+    data.gsub(/^---\n(.*?\n)---\n/) do
       @markup.metadata ||= {}
-      @markup.metadata = @markup.metadata.merge(YAML.load(Regexp.last_match[2]))
-      ''
+      @markup.metadata = @markup.metadata.merge(YAML.load(Regexp.last_match[1]))
     end
+
+    # data.gsub(/^```-yaml\n(.*)^```\n/m) do
+    #   @markup.metadata ||= {}
+    #   @markup.metadata = @markup.metadata.merge(YAML.load(Regexp.last_match[2]))
+    #   ''
+    # end
   end
+
   def process(data)
     head = ""
     if @markup.metadata
@@ -80,10 +115,14 @@ Precious::App.set(:wiki_options, {
     :filter_chain =>
         # [:Metadata, :MustachePreProcessor, :PlainText, :TOC, :RemoteCode, :Code, :Macro, :MustachePostProcessor, :Sanitize, :Tags, :Render]
         #[:FrontMatter, :Metadata, :PlainText, :GollumCavesPlugins, :TOC, :RemoteCode, :Code, :Macro, :Sanitize, :Tags, :Render],
-        [:FrontMatter, :Metadata, :PlainText, :TOC, :RemoteCode, :Code, :Macro, :Sanitize, :Tags, :Render],
+        #[:FrontMatter, :MustachePreProcessor, :PlainText, :TOC, :RemoteCode, :Code, :Macro, :MustachePostProcessor, :Sanitize, :Tags, :Render],
+        [:FrontMatter, :MustachePreProcessor, :PlainText, :TOC, :RemoteCode, :Code, :Macro, :MustachePostProcessor, :Tags, :Render],
+
 #    :css => true,
     :repo_is_bare => false,
     :template_dir => "templates",
     :allow_uploads => true,
     :per_page_uploads => true
 })
+
+require 'gollum-caves/bootstrap'

@@ -12,6 +12,10 @@ module Precious
       def wikipath
         @wikipath
       end
+      def attachments
+      end
+      def has_attachments
+      end
     end
   end
 end

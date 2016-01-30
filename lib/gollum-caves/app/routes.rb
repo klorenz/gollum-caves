@@ -3,7 +3,7 @@ require 'gollum-lib/committer'
 module Valuable
   class App
     get '/' do
-      redirect clean_url(::File.join(@base_url, @wiki_base, @wiki_home, @page_dir, wiki_new(@wiki_base, @wiki_home).index_page))
+      redirect to clean_url @wiki_manager.get_default_page()
     end
 
     get '/latest_changes/:coll/:wiki' do
@@ -82,6 +82,7 @@ module Valuable
           @page = file
           @title = wikip.name
           @content = file.raw_data
+          @page.version = wiki.repo.log(wiki.ref, @page.path).first
           mustache :edit
         else
           @editor_upload = true
@@ -93,6 +94,7 @@ module Valuable
     end
 
     get '/wiki-create/:coll/:wiki' do
+      #wiki_manager
       # forbid unless @allow_manage_wiki(params[:coll])
       # wiki_dir = ::File.join(settings.gollum_path, params[:coll], params[:wiki])
       # output = `mkdir -p #{wiki_dir} ; cd #{wiki_dir} ; git init`
@@ -169,7 +171,7 @@ module Valuable
       page = wikip.page
       if page
         page_dir = settings.wiki_options[:page_file_dir].to_s
-        redirect to("/#{@wikipath}/#{clean_url(::File.join(page_dir, page.escaped_url_path))}")
+        redirect to(clean_url(::File.join(page_dir, page.escaped_url_path)))
       else
         @redirect_url = request.referer
         mustache :create
@@ -300,6 +302,15 @@ module Valuable
         @message = "Duplicate page: #{e.message}"
         mustache :error
       end
+    end
+
+    # edit or delete metadata in a page
+    post '/metadata/:coll/:wiki/*' do
+      action = params[:action]
+      action = 'update' if action.nil?
+
+#      params = JSON.parse(request.env["rack.input"].read).merge(params)
+
     end
 
     post '/create' do
