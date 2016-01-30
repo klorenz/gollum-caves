@@ -19,6 +19,9 @@ init-bare:
 	git init --bare wiki/wiki/home.git
 	git init --bare wiki/wiki/skeleton.git
 
+install-bootstrap:
+	cp -r bower_components/bootstrap/dist public/gollum-caves/bootstrap
+
 glyphs:
 	fontello-cli install --config public/gollum-caves/fonts/config.json \
 	--font public/gollum-caves/fonts/ --css public/gollum-caves/css/

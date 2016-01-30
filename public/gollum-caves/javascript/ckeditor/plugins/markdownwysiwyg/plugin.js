@@ -7289,7 +7289,7 @@ module.exports = require('./lib/');
       }
     });
     htmlFromMarkdown = function(source) {
-      return mdit.render(source);
+      return mdit.render(source.replace(/\t/g, '    '));
     };
     CKEDITOR.on('dialogDefinition', function(ev) {
       var definition, name, ref, tab;
@@ -7395,15 +7395,26 @@ module.exports = require('./lib/');
     generateCloseTag = function(node) {
       return "</" + node.tag + ">\n";
     };
-    generateHtml = function(node) {
+    generateHtml = function(node, indent) {
       var c, j, len1, ref, s;
-      s = generateOpenTag(node);
-      ref = node.children;
-      for (j = 0, len1 = ref.length; j < len1; j++) {
-        c = ref[j];
-        s += generateHtml(c);
+      if (indent == null) {
+        indent = "";
       }
-      s += generateCloseTag(node);
+      if (typeof node === 'string') {
+        return indent + node;
+      }
+      s = indent + generateOpenTag(node);
+      if (node.children) {
+        ref = node.children;
+        for (j = 0, len1 = ref.length; j < len1; j++) {
+          c = ref[j];
+          s += generateHtml(c, indent + "  ");
+        }
+      }
+      if (!s.match(/\n$/)) {
+        s += "\n";
+      }
+      s += indent + generateCloseTag(node);
       return s;
     };
     html2markdown = {
@@ -7436,13 +7447,17 @@ module.exports = require('./lib/');
         }
       },
       table: {
-        collect: true,
+        collect: 'inherit',
         tagClose: function(node) {
+          debugger;
+          var result;
           if (node.htmlTable) {
-            return generateHtml(node);
+            result = generateHtml(node);
           } else {
-            return writeMarkdownTable(node);
+            result = writeMarkdownTable(node);
           }
+          this._write(result);
+          return this.flush();
         }
       },
       tbody: {},
@@ -7453,22 +7468,16 @@ module.exports = require('./lib/');
       row: {},
       td: {
         tagClose: function(node) {
-          if (indexOf.call(node.output, "\n") >= 0) {
-            this.getParentNode('table').htmlTable = true;
+          if (indexOf.call(node.children[node.children.length - 1], "\n") >= 0) {
+            return this.getParentNode('table').htmlTable = true;
           }
-          return {
-            collect: true
-          };
         }
       },
       th: {
         tagClose: function(node) {
-          if (indexOf.call(node.output, "\n") >= 0) {
-            this.getParentNode('table').htmlTable = true;
+          if (indexOf.call(node.children[node.children.length - 1], "\n") >= 0) {
+            return this.getParentNode('table').htmlTable = true;
           }
-          return {
-            collect: true
-          };
         }
       },
       dl: {},
@@ -7484,7 +7493,7 @@ module.exports = require('./lib/');
           return "\n" + generateCloseTag(node);
         }
       },
-      ul: [],
+      ul: ['', '\n'],
       li: function(node) {
         console.log("li", this.getParentNode().tag);
         if (this.getParentNode().tag === 'ul') {
@@ -7501,10 +7510,10 @@ module.exports = require('./lib/');
           };
         }
       },
-      ol: [],
+      ol: ['', '\n'],
       br: {
         hasCloser: false,
-        tagOpen: "\n",
+        tagOpen: "  \n",
         tagClose: ""
       },
       hr: {
@@ -7576,7 +7585,7 @@ module.exports = require('./lib/');
         },
         '$': function(element) {
           var ref;
-          if (element.name === 'li') {
+          if (element.name === 'td') {
             if (element.children.length === 1) {
               if (element.children[0].name === 'p') {
                 element.children = element.children[0].children;
@@ -7615,14 +7624,16 @@ module.exports = require('./lib/');
       }
 
       MarkdownWriter.prototype.openTag = function(tag) {
-        var attr, children, collect, current, nextSpec, output;
+        var attr, children, collect, current, nextSpec, output, spec;
         attr = {};
         output = '';
         children = [];
         collect = false;
         if (this._.stack.length) {
           current = this.getCurrentNode();
-          collect = current.collect;
+          if (current && current.collect === 'inherit') {
+            collect = current.collect;
+          }
         }
         nextSpec = {
           tag: tag,
@@ -7632,8 +7643,12 @@ module.exports = require('./lib/');
           collect: collect
         };
         this._.stack.push(nextSpec);
-        if (collect) {
-          return current.children.push(nextSpec);
+        spec = this.getSpec(nextSpec);
+        if (collect && current) {
+          current.children.push(nextSpec);
+        }
+        if (collect !== 'inherit') {
+          return nextSpec.collect = spec.collect;
         }
       };
 
@@ -7712,8 +7727,6 @@ module.exports = require('./lib/');
           if (spec.hasCloser === false) {
             return this.flush();
           }
-        } else {
-          return current.collect = true;
         }
       };
 
@@ -7766,6 +7779,8 @@ module.exports = require('./lib/');
         if (!current.collect) {
           this._write(s);
           this.flush();
+        } else {
+          this._.stack.pop();
         }
         if (spec.next) {
           return this.spec_stack.pop();
@@ -7809,7 +7824,10 @@ module.exports = require('./lib/');
         return config = editor.config, editor;
       },
       tools: {
-        wrapped: wrapped
+        wrapped: wrapped,
+        generateOpenTag: generateOpenTag,
+        generateCloseTag: generateCloseTag,
+        generateHtml: generateHtml
       }
     });
     return pluginPath = CKEDITOR.plugins.getPath('markdownwysiwyg');

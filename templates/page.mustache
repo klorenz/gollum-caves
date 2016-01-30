@@ -112,6 +112,16 @@ $(function(){
   <p>
     <a href="{{base_url}}/wiki/me">about</a> | <a href="{{base_url}}/wiki-plugins/me">plugins</a>
   </p>
+
+  {{#has_attachments}}
+  <p>Attachments:
+  <ul>
+  {{#attachments}}
+    <li><a href="{{base_url}}/{{wikipath}}/{{filename}}">{{filename_stripped}}</a></li>
+  {{/attachments}}
+  </ul>
+  </p>
+  {{/has_attachments}}
 </div>
 </div>
 

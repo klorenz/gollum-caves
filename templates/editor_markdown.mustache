@@ -284,6 +284,9 @@
   {{/is_edit_page}}
   <input type="hidden" name="path" id="gollum-editor-page-path" value="{{path}}">
   <input type="hidden" name="wikipath" id="gollum-editor-page-path" value="{{wikipath}}">
+  {{#page}}
+  <input type="hidden" name="version" id="gollum-editor-page-path" value="{{version}}">
+  {{/page}}
   <textarea id="gollum-editor-body" name="content">{{content}}</textarea>
 
 
