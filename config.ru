@@ -10,7 +10,7 @@ require 'rack/urlmap'
 # })
 
 map "/wiki" do
-  run Valuable::App
+  run Precious::App
 end
 
 map "/dav" do

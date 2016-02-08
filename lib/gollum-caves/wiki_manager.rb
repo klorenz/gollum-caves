@@ -3,11 +3,26 @@ require 'gollum-caves/filename'
 require 'gollum-caves/wiki_settings'
 require 'gollum-caves/wiki'
 require 'gollum-caves/logging'
+require 'gollum-lib/sanitization'
 require 'grit_adapter/git_layer_grit'
+
+require 'pathname'
+require 'find'
 
 # TODO: create cache for wiki settings
 
 module GollumCaves
+  class Sanitization < Gollum::Sanitization
+    REMOVE_CONTENTS = [].freeze
+  end
+
+  #     { 'a' => {
+  #         'href' => [ :relative, 'https', 'http', 'mailto', 'ftp' ]
+  #       }
+  #     }
+  #   end
+  # end
+
   class CollectionDoesNotExist < RuntimeError
   end
 
@@ -18,6 +33,19 @@ module GollumCaves
 
     attr_reader :settings
     attr_reader :settings_page_path
+
+    attr_reader :meta_wiki_name
+    attr_reader :main_coll_name
+    attr_reader :default_wiki_name
+    attr_reader :default_coll_name
+    attr_reader :plugin_coll_name
+
+    def default_committer
+      {
+        :name => @default_committer_name,
+        :mail => @default_committer_mail,
+      }
+    end
 
     # Public: Initialize a new WikiManager
     #
@@ -35,6 +63,7 @@ module GollumCaves
     #
     # Returns a GollumCaves::WikiManager
     def initialize(rootpath, opts={})
+      log_debug("initialize: opts=#{opts}")
       @root = rootpath
       @wiki_cache = {}
       initialize_attrs read_farm_settings.merge(opts)
@@ -51,6 +80,7 @@ module GollumCaves
       farm_settings = File.join(@root, "settings.yml")
 
       write_settings = true
+      created = false
 
       if File.exist? farm_settings and not override_settings
         initialize_attrs YAML.load File.read(farm_settings)
@@ -58,22 +88,36 @@ module GollumCaves
       end
 
       if not exists_collection? @main_coll_name
-        create_collection(@main_coll_name)
+        template_dir = File.expand_path("../../../wiki-templates/wiki/about", __FILE__)
+        create_collection(@main_coll_name, template: template_dir)
+        log_info "created main collection #{@main_coll_name}"
+        created = true
       end
 
       if not exists_collection? "wiki-plugins"
         create_collection("wiki-plugins", bare: false)
+        log_info "created wiki-plugins collection"
       end
 
-      if not exists_collection? @default_coll
-        create_collection(@default_coll)
+      # TODO: this might be done in meta_coll settings configuration rather than system config
+
+      if not exists_collection? @default_coll_name
+        if @default_coll_name != '<meta-setting>'
+          create_collection(@default_coll_name)
+          log_info "created default collection #{@default_coll_name}"
+        end
       end
 
-      if not exists? @default_wiki
-        create_wiki(@default_coll, @default_wiki)
+      if not exists? "#{@default_coll_name}/#{@default_wiki_name}"
+        if @default_wiki_name != '<meta-setting>'
+          create_wiki(@default_coll_name, @default_wiki_name)
+          log_info "created default wiki #{@default_coll_name}/#{@default_wiki_name}"
+        end
       end
 
       write_farm_settings if write_settings
+
+      return created
     end
 
     # Public: Return default landing page for given collection and wikiname
@@ -82,17 +126,18 @@ module GollumCaves
     # wikiname   - Optional String name of wiki
     # page_dir   - Optional Directory in wiki, where pages are located.
     def get_default_page(collection=nil, wikiname=nil, page_dir=nil)
-      collection ||= @default_coll
-      wikiname   ||= @default_wiki
+      collection ||= @default_coll_name
+      wikiname   ||= @default_wiki_name
       page_dir = page_dir.to_s
+      log_debug("get_default_page: default_coll=#{@default_coll_name}, default_wiki=#{@default_wiki_name}")
       index_page = wiki(collection, wikiname).index_page
       clean_url [collection, wikiname, page_dir, index_page].join "/"
     end
 
     # def page_url(collection=nil, wikiname=nil, page_dir=nil, page=nil, wiki=nil)
     #   if wiki.nil?
-    #     collection ||= @default_coll
-    #     wikiname   ||= @default_wiki
+    #     collection ||= @default_coll_name
+    #     wikiname   ||= @default_wiki_name
     #     page_dir   = page_dir.to_s
     #     w = wiki(collection, wikiname)
     #
@@ -104,6 +149,7 @@ module GollumCaves
         create_wiki(name, @meta_wiki_name, {
           :bare => bare,
           :assert_valid_collection => false,
+          :template => template
         })
       else
         true
@@ -111,10 +157,15 @@ module GollumCaves
     end
 
     def exists_collection?(name)
-      exists?("#{name}/#{@meta_wiki_name}")
+      exists?(name, @meta_wiki_name)
     end
 
-    def exists?(name)
+    def exists?(collection, name=nil)
+      if name.nil?
+        name = collection
+      else
+        name = "#{collection}/#{name}"
+      end
       # we could raise here an exception if name not matches collection/wiki
       return true if File.directory?("#{@root}/#{name}.git")
       return true if File.directory?("#{@root}/#{name}/.git")
@@ -130,11 +181,33 @@ module GollumCaves
       wiki(@main_coll_name, @meta_wiki_name, opts)
     end
 
+    def wikifile(fullpath)
+      cn, wn, pn = split_wiki_path fullpath
+      wiki(cn, wn).wikifile(pn)
+    end
+
+    def list_collections()
+      Dir.entries(@root).each do |entry|
+        next if entry[0] == "."
+        next unless File.directory?(File.join(@root, entry))
+        entry
+      end
+    end
+
+    def list_wikis(collection)
+      Dir.entries(File.join(@root, collection)).each do |entry|
+        next if entry[0] == "."
+        next unless File.directory?(File.join(@root, collection, entry))
+        entry.gsub(/\.git$/, '')
+        next unless exists? entry
+      end
+    end
+
     def get_coll_wiki_names(collection = nil, name = nil)
-      if name.nil?
-        if collection.nil?
-          collection ||= @default_coll
-          name       ||= @default_wiki
+      if name.nil? or name.empty?
+        if collection.nil? or collection.empty?
+          collection ||= @default_coll_name
+          name       ||= @default_wiki_name
         else
           if collection[0] == "/"
             collection = collection[1..-1]
@@ -153,11 +226,23 @@ module GollumCaves
       collection, name = get_coll_wiki_names(collection, name)
       wikipath = "#{collection}/#{name}"
 
+      log_debug "wiki: wikipath=#{wikipath}"
+
       if @wiki_cache.has_key? wikipath
         return @wiki_cache[wikipath]
       end
 
-      options = {}
+      options = {
+        :mathjax => true,
+        :filter_chain =>
+          [:FrontMatter, :MustachePreProcessor, :PlainText, :RemoteCode, :Code, :Macro, :MustachePostProcessor, :Tags, :Render],
+        :allow_uploads => true,
+        :per_page_uploads => true,
+        :ref => 'master',
+        :sanitization => GollumCaves::Sanitization.new(),
+        :index_page => 'Home',
+      }
+
       if not opts.nil?
         options = options.merge(opts)
       end
@@ -183,7 +268,6 @@ module GollumCaves
       collection, wiki = get_coll_wiki_names(collection, wiki)
 
       bare     = opts.fetch(:bare, @is_bare)
-      template = opts[:template]
 
       if opts.fetch(:assert_valid_collection, true)
         unless exists_collection? collection
@@ -195,11 +279,37 @@ module GollumCaves
       # puts `git init #{extra_args} "#{@root}/#{repo_name}" #{extra_args} 2>&1`
       # $?.exitstatus == 0
       #
+
       if bare
         Gollum::Git::Repo.init_bare("#{@root}/#{collection}/#{wiki}.git")
       else
         Gollum::Git::Repo.init("#{@root}/#{collection}/#{wiki}")
       end
+
+      unless opts[:template].nil?
+        template = Pathname.new opts[:template]
+        if File.directory? template
+          files = {}
+          Find.find(template) do |path|
+            if File.directory? path
+              next unless File.basename(path)[0] == ?.
+              Find.prune
+            else
+              pn = Pathname.new path
+              relative = pn.relative_path_from template
+              files[relative.to_s] = File.read(path)
+            end
+          end
+
+          wiki(collection, wiki).commit_files(
+            author: default_committer,
+            message: "Initial commit from gollum-caves templates",
+            files: files,
+          )
+
+        end
+      end
+
       wiki(collection, wiki)
     end
 
@@ -220,14 +330,14 @@ module GollumCaves
     # Public: expand path into collection, wikiname and path
     def split_wiki_path(path)
       if path == "/"
-        cn, wn, pn = @default_coll, @default_wiki, "/"
+        cn, wn, pn = @default_coll_name, @default_wiki_name, "/"
       else
         path = path[1..-1] if path[0] == '/'
 
         cn, wn, pn = path.split('/', 3)
         pn = '/' if pn.nil? or pn.empty?
 #        pn = '/'+pn if pn[0] != '/'
-        wn = @default_wiki if wn.nil? or wn.empty?
+        wn = @default_wiki_name if wn.nil? or wn.empty?
       end
       [ cn, wn, pn ]
     end
@@ -265,10 +375,13 @@ module GollumCaves
     private
 
     def initialize_attrs(opts)
-      @meta_wiki_name   = opts.fetch :meta_wiki_name,     "me"
+      log_debug("initialize_attrs: opts=#{opts}")
+      @meta_wiki_name   = opts.fetch :meta_wiki_name,     "about"
       @main_coll_name   = opts.fetch :main_coll_name,     "wiki"
-      @default_coll     = opts.fetch :default_coll_name,  "wiki"
-      @default_wiki     = opts.fetch :default_wiki_name,  @meta_wiki_name
+      @default_coll_name     = opts.fetch :default_coll_name,  "wiki"
+      @default_wiki_name     = opts.fetch :default_wiki_name,  @meta_wiki_name
+      @default_committer_name = opts.fetch :default_committer_name,  "Gollum"
+      @default_committer_mail = opts.fetch :default_committer_mail,  "gollum@middle.earth"
       @plugin_coll_name = opts.fetch :plugin_coll_name,   "wiki-plugins"
       @settings_page_path = opts.fetch :settings_page_path, "Settings.md"
       @is_bare            = opts.fetch :use_bare_repos,     false
@@ -286,7 +399,7 @@ module GollumCaves
     def read_farm_settings()
       farm_settings = File.join(@root, "settings.yml")
 
-      if File.exist? farm_settings and not override_settings
+      if File.exist? farm_settings
         settings = YAML.load File.read(farm_settings)
       else
         settings = read_default_farm_settings
@@ -316,8 +429,10 @@ module GollumCaves
       settings = default_farm_settings.merge current_settings
       settings['meta_wiki_name']['value']     = @meta_wiki_name
       settings['main_coll_name']['value']     = @main_coll_name
-      settings['default_wiki_name']['value']  = @default_wiki
-      settings['default_coll_name']['value']  = @default_coll
+      settings['default_wiki_name']['value']  = @default_wiki_name
+      settings['default_coll_name']['value']  = @default_coll_name
+      settings['default_committer_name']['value']  = @default_committer_name
+      settings['default_committer_mail']['value']  = @default_committer_mail
       settings['plugin_coll_name']['value']   = @plugin_coll_name
       settings['settings_page_path']['value'] = @settings_page_path
       settings['use_bare_repos']['value']     = @is_bare

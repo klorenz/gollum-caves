@@ -179,6 +179,23 @@ Status: Draft
 
 - Handle big files (start with deny upload of big files)
 
+  Having https://github.com/cdunn2001/git-sym/wiki/Details in mind:
+
+  - Create a simple script, which handles big files
+
+  - For a big file, there is created a file ".get-<filename>.mak", which
+    contains the rules how to create <filename>.  <filename> itself will
+    be added to .gitignore file.
+
+      git
+
+
+
+
+
+
+
+
 - finish DAV Resource
 
 - check for edit clashes on save
@@ -201,3 +218,13 @@ Status: Draft
   They must be updated, if the file has been updated.  (If the hashed location changed)
 
 - HTML import to Markdown
+
+
+- other markdown editors: https://github.com/NextStepWebs/simplemde-markdown-editor/
+- trumbowyg
+- aloha
+- http://epiceditor.com/
+http://blog.netgusto.com/tag/wysiwyg/
+
+| foo | bar |
+|-----|-----|

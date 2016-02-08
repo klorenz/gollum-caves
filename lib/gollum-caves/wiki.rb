@@ -54,6 +54,12 @@ module GollumCaves
     #
     def wikifile(path, version=nil)
       log_info "wikifile: #{path}, #{version}"
+      path = Gollum::Page.cname(path.gsub('+', '-'))
+      ext = File::extname(path)
+      if ext == ''
+        path = path+'.md'
+      end
+
       WikiFile.find(self, path, version)
     end
 
@@ -117,25 +123,43 @@ module GollumCaves
       committer = Gollum::Committer.new(@wiki, options)
 
       files.each do |path,contents|
-        if wikifile_exists? path, parent
-          log_debug "    path: #{path}, contents: #{normalize(contents)}"
-          committer.add(path.dup, normalize(contents))
+        path = path.dup.gsub(/^\.\//, '')
+        if contents.nil?
+          committer.index.delete(path)
         else
-          dir, name, format = split_path path
-          committer.add_to_index(dir, name, format, contents)
+          committer.index.add(path, normalize(contents))
         end
+        # if wikifile_exists? path, parent
+        #   log_debug "    U path: #{path}, contents: #{normalize(contents)}"
+        #   committer.index.add(path.dup, normalize(contents))
+        # else
+        #   log_debug "    A path: #{path}, contents: #{normalize(contents)}"
+        #   dir, name, format = split_path path
+        #   committer.add_to_index(dir, name, format, contents)
+        # end
       end
 
       committer.after_commit do |index, sha|
+        log_debug "  after_commit: #{index}, #{sha}"
         @wiki.clear_cache
 
         files.each do |path,contents|
-          dir, name, format = split_path path
-          index.update_working_dir(dir, name, format)
+          path = path.gsub(/^\.\//, '')
+          #dir, name, format = split_path path
+          unless @wiki.repo.bare
+            Dir.chdir(::File.join(@wiki.repo.path, "..")) do
+              if contents.nil?
+                @wiki.repo.git.rm(path, :force => true)
+              else
+                @wiki.repo.git.checkout(path, 'HEAD')
+              end
+            end
+          end
         end
       end
 
-      committer.commit
+      sha = committer.commit
+      log_debug "sha #{sha}"
     end
   end
 end

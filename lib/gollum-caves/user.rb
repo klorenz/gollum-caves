@@ -1,7 +1,12 @@
 module GollumCaves
   class User
-    initialize(username, name, mail, roles)
-      @username = usernanme
+    attr_reader :username
+    attr_reader :name
+    attr_reader :mail
+    attr_reader :roles
+
+    def initialize(username: nil, name: nil, mail: nil, roles: nil)
+      @username = username
       @name = name
       @mail = mail
       @roles = roles
@@ -10,8 +15,8 @@ module GollumCaves
     # Public: return
     def author
       {
-        :name => @name
-        :mail => @mail
+        :name => @name,
+        :mail => @mail,
       }
     end
   end

@@ -1,9 +1,10 @@
 require 'gollum-lib/committer'
 
-module Valuable
+module Precious
   class App
+
     get '/' do
-      redirect to clean_url @wiki_manager.get_default_page()
+      redirect to clean_url "/view/" + @wm.get_default_page()
     end
 
     get '/latest_changes/:coll/:wiki' do
@@ -46,26 +47,21 @@ module Valuable
       @path        = wikip.path
       @upload_dest = find_upload_dest(@path)
 
-      @editor_markdown = false
-      @editor_svg      = false
-      @editor_source   = false
-      @editor_upload   = false
-
       ext = ::File.extname(@name)
 
       if ext == ".md" or ext.empty?
-        @editor_markdown = true
+        @editor = "markdown"
       elsif ext == ".svg"
-        @editor_svg = true
+        @editor = "svg"
       # if is textfile
       elsif wikip.name.match(/\.(txt|rst|css|less|js|coffee|c|cpp|cxx|h|hpp|hxx)$/)
-        @editor_source = true
+        @editor = "source"
       else
-        @editor_upload = true
+        @editor = "upload"
       end
       wiki = wikip.wiki
 
-      puts "edit 2 name #{@name}, path #{@path}, ext #{ext}, editor_markdown: #{@editor_markdown}, wikip.filepath #{wikip.filepath}"
+      puts "edit 2 name #{@name}, path #{@path}, ext #{ext}, editor: #{@editor}, wikip.filepath #{wikip.filepath}"
       file = wiki.file(wikip.filepath, wiki.ref, false)
       puts "edit 2 file: #{file}"
 
@@ -89,7 +85,7 @@ module Valuable
           mustache :edit
         end
       else
-        redirect to("/create/#{@wikipath}/#{encodeURIComponent(@name)}")
+        redirect to("/create/#{encodeURIComponent(@name)}")
       end
     end
 
@@ -111,72 +107,6 @@ module Valuable
 #      forbid unless @allow_read_wiki(params[:coll], params[:wiki])
     end
 
-    get '/create/*' do
-      forbid unless @allow_editing
-      @filename = params[:splat].first.gsub('+', '-')
-      wikip = wiki_page(@filename)
-      @name = wikip.name.to_url
-      format = params[:format].to_s
-
-      puts "create 1 name #{@name}, path #{@path}, ext #{format}"
-
-      if format.empty?
-        format = ::File.extname(@filename)[1..-1].to_s
-        @name = ::File.basename(@filename, "."+format).to_url
-        if format.empty?
-          format = "markdown"
-        end
-      end
-
-      puts "create 2 name #{@name}, path #{@path}, ext #{format}"
-      # ext = ::File.extname(@filename)
-      #
-      # if ext == ""
-      #   ext  = ".md"
-      #   wikip = wiki_page("#{@filename}")
-      # end
-
-      @path = wikip.path
-
-      @editor_markdown = false
-      @editor_svg      = false
-      @editor_source   = false
-      @editor_upload   = false
-
-      if format == "markdown"
-        @editor_markdown = true
-      elsif format == "svg"
-        @editor_svg = true
-      # if is textfile
-      elsif wikip.name.match(/\.(txt|rst|css|less|js|coffee|c|cpp|cxx|h|hpp|hxx)$/)
-        @editor_source = true
-      else
-        @editor_upload = true
-      end
-
-      puts "create name #{@name}, path #{@path}, ext #{format}, editor_markdown: #{@editor_markdown}"
-      @allow_uploads = wikip.wiki.allow_uploads
-      @upload_dest   = find_upload_dest(@path)
-
-      page_dir = settings.wiki_options[:page_file_dir].to_s
-      unless page_dir.empty?
-        # --page-file-dir docs
-        # /docs/Home should be created in /Home
-        # not /docs/Home because write_page will append /docs
-        @path = @path.sub(page_dir, '/') if @path.start_with? page_dir
-      end
-      @path = clean_path(@path)
-      @path = "/#{@wikipath}#{@path}"
-
-      page = wikip.page
-      if page
-        page_dir = settings.wiki_options[:page_file_dir].to_s
-        redirect to(clean_url(::File.join(page_dir, page.escaped_url_path)))
-      else
-        @redirect_url = request.referer
-        mustache :create
-      end
-    end
 
     post '/edit/*' do
       path      = '/' + clean_url(sanitize_empty_params(params[:path])).to_s
@@ -203,7 +133,7 @@ module Valuable
         if not params[:redirect].nil?
           redirect_url = params[:redirect]
         else
-          redirect_url = "/#{@wikipath}/#{wikip.filepath}"
+          redirect_url = "/#{wikip.filepath}"
         end
 
         puts("redirect_url: #{redirect_url}")
@@ -313,82 +243,37 @@ module Valuable
 
     end
 
-    post '/create' do
-      name   = params[:page].to_url
-      path   = sanitize_empty_params(params[:path]) || ''
 
-      format = params[:format].to_s
 
-      wikip  = wiki_page(name, path)
-      wiki   = wikip.wiki
-      path   = wikip.path
-
-      puts "1 name: '#{name}'"
-
-      path.gsub!(/^\//, '')
-
-      ext = ::File.extname(name)
-      if format.empty?
-        if ext == ""
-          format = :markdown
-        elsif ext == ".md"
-          format = :markdown
-          name = ::File.basename(name)
-        else
-          format = ext[1..-1]
-          name = ::File.basename(name)
-        end
-      else
-        if ext != ""
-          name = ::File.basename(name)
-        end
-      end
-      # #   name = "#{name}.#{ext}"
-      # #   format = :markdown
-      # # else
-      # #   format = ext
-      # # end
-      #
-      # if format == "svg"
-      #   filename = name
-      #   if ::File.extname(filename) != format
-      #     filename = "#{filename}.#{format}"
-      #   end
-      #
-      #   options = {
-      #     :message => "Edited SVG file",
-      #     :parent  => wiki.repo.head.commit,
-      #   }
-      #   author = session['gollum.author']
-      #   unless author.nil?
-      #     options.merge! author
-      #   end
-      #
-      #   begin
-      #     committer = Gollum::Committer.new(wiki, options)
-      #     puts "committer: #{committer}"
-      #     committer.add_to_index(path, filename, format, params[:content])
-      #     committer.after_commit do |committer, sha|
-      #       wiki.clear_cache
-      #       committer.update_working_dir(dir, filename, format)
-      #     end
-      #     committer.commit
-      #     redirect to(request.referer)
-      #   rescue Gollum::DuplicatePageError => e
-      #     @message = "Duplicate page: #{e.message}"
-      #     mustache :error
-      #   end
-      # else
-      puts "2 name: '#{name}', format: '#{format}', path: '#{path}'"
-      begin
-        wiki.write_page(name, format, params[:content], commit_message, path)
-
-        page_dir = settings.wiki_options[:page_file_dir].to_s
-        redirect to("/#{wikip.collection}/#{wikip.wikiname}/#{clean_url(::File.join(page_dir, path, encodeURIComponent(name)))}")
-      rescue Gollum::DuplicatePageError => e
-        @message = "Duplicate page: #{e.message}"
-        mustache :error
-      end
+    get '/view/*' do
+      show_page_or_file2(params[:splat].first)
     end
+
+    get '/*' do
+      show_page_or_file(params[:splat].first)
+    end
+
+
+    # get '/view/:collname/:wikiname/*' do
+    #   collname = params[:collname]
+    #   wikiname = params[:wikiname]
+    #   filepath = params[:splat].first
+    #
+    #   render_wikifile(collname, wikiname, filepath)
+    # end
+    #
+    # def render_wikifile(collname, wikiname, filepath)
+    #   wikifile = @wm.wiki(collname, wikiname).wikifile(filename)
+    #   if page = wikifile.as_page()
+    #     @page = page
+    #     @name = wikifile.name
+    #     @content = page.formatted_data
+    #     @upload_dest = find_upload_dest(filepath)
+    #     @editable    = true
+    #     @page_exists = !page.versions.empty?
+    #     mustache :page
+    #   end
+    #     #@toc_content = @
+    # end
   end
 end

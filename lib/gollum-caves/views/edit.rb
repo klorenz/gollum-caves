@@ -3,30 +3,16 @@ require 'gollum/views/edit'
 module Precious
   module Views
     class Edit
-      def editor_markdown
-        @editor_markdown
+      attr_reader :editor
+      def editor_setup
+        "#{@editor}_setup"
       end
-      def editor_source
-        @editor_source
-      end
-      def editor_svg
-        @editor_svg
-      end
-      def filename
-        @filename
-      end
-      def wikicoll
-        @wikicoll
-      end
-      def wikiname
-        @wikiname
-      end
-      def wikipath
-        @wikipath
-      end
-      def redirect_url
-        @redirect_url
-      end
+      attr_reader :filename
+      attr_reader :wikicoll
+      attr_reader :collname
+      attr_reader :wikiname
+      attr_reader :wikipath
+      attr_reader :redirect_url
     end
   end
 end

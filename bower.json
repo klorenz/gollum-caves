@@ -1,0 +1,23 @@
+{
+  "name": "gollum-caves",
+  "description": "Gollum caves",
+  "main": "index.js",
+  "authors": [
+    "Kay-Uwe (Kiwi) Lorenz <kiwi@franka.dyndns.org>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/klorenz/gollum-caves",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.6",
+    "jsonform": "https://github.com/joshfire/jsonform.git"
+  }
+}

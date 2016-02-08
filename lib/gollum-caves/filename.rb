@@ -6,17 +6,8 @@ module GollumCaves
     #
     # Returns a tuple `[dir, name, format]`.
     def split_path(path)
-      ext = File.extname(path)
       dir = File.dirname(path)
-      name = File.basename(path, ext)
-
-      format = case ext
-        when ".md"
-          :markdown
-        else
-          ext[1..-1].to_sym
-        end
-
+      name, format = Gollum::Page.parse_filename(File.basename(path))
       [dir, name, format]
     end
   end

@@ -13,8 +13,31 @@ module GollumCaves
       @blob = tree_entry.blob(@wiki.repo)
     end
 
+    attr_reader :path
+    attr_reader :wiki
+
     def version
       @commit.id
+    end
+
+    def as_page
+      dir = File::dirname(@path)
+      if dir.empty? or dir == '.'
+        dir = nil
+      end
+      name = File::basename(@path)
+
+      log_debug("as_page: name=#{name}, version=#{version}, dir=#{dir}")
+      #dir, name, format = split_path @path
+      #@wiki.page(name, version, dir)
+      page = @tree_entry.page(@wiki, @commit)
+      log_debug("page: #{page}")
+      page
+    end
+
+    def as_file
+      log_debug("as_file: path=#{@path}, version=#{version}")
+      @wiki.file(@path, version)
     end
 
     def raw_data()
@@ -42,10 +65,10 @@ module GollumCaves
       map = wiki.tree_map_for(version)
 
       log_debug "map #{map}"
-
       log_debug path
 
-      check_path = "./#{path}"
+      #check_path = "./#{path}"
+      check_path = path
       log_debug "check_path: #{check_path}"
 
       if (tree_entry = map.detect { |entry| log_debug "entry.path #{entry.path}" ; entry.path == check_path })
