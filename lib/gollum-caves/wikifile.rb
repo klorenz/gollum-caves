@@ -1,5 +1,7 @@
 require 'gollum-caves/logging'
 
+
+
 module GollumCaves
   class WikiFile
     include GollumCaves::FileNameMixin
@@ -16,27 +18,64 @@ module GollumCaves
     attr_reader :path
     attr_reader :wiki
 
+    def format
+      @format ||= unless as_page.nil?
+        as_page.format
+      else
+        if extension == ''
+          :text
+        else
+          extension.to_sym
+        end
+      end
+    end
+
+    def extension
+      @ext ||= File.extname(filename)
+    end
+
+    def dir
+      File.dirname(@path)
+    end
+
+    def filename
+      @filename ||= if as_page.nil?
+        as_page.filename
+      else
+        @path
+      end
+    end
+
+    def name
+      @name ||= if as_page.nil?
+        as_page.name
+      else
+        File.basename(@path, extension)
+      end
+    end
+
+    def update_metadata(opts)
+      author   = opts[:author]
+      message  = opts[:message]
+      more_metadata = opts[:metadata]
+
+      metadata.deep_merge more_metadata
+      # write metadata using a writer depending on format
+    end
+
+    def method_missing(method, *args, &block)
+      as_page.send(method, *args, &block)
+    end
+
     def version
       @commit.id
     end
 
     def as_page
-      dir = File::dirname(@path)
-      if dir.empty? or dir == '.'
-        dir = nil
-      end
-      name = File::basename(@path)
-
-      log_debug("as_page: name=#{name}, version=#{version}, dir=#{dir}")
-      #dir, name, format = split_path @path
-      #@wiki.page(name, version, dir)
-      page = @tree_entry.page(@wiki, @commit)
-      log_debug("page: #{page}")
-      page
+      @page ||= @tree_entry.page(@wiki, @commit)
     end
 
     def as_file
-      log_debug("as_file: path=#{@path}, version=#{version}")
       @wiki.file(@path, version)
     end
 

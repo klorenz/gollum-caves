@@ -149,7 +149,11 @@ module Precious
         @attachments   = []
         log_debug("page.path: #{page.path}")
         @has_attachments = !@attachments.empty?
-        #@wikifile.wiki.list_dir("#{page.path}")
+
+        @collname = @wikicoll = wikifile.wiki.collname
+        @wikiname = wikifile.wiki.wikiname
+        @wikipath = wikifile.wiki.wikipath
+        @filename = wikifile.filename
 
         mustache :page
       else

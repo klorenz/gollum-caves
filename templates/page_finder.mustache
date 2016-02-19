@@ -1,0 +1,99 @@
+<script>
+$(function(){
+  console.log("page_finder");
+  $('#wiki-page-finder').on('shown.bs.modal', function(){
+    console.log("set focus!");
+    $('#wiki-page-finder-input').focus();
+  });
+
+  Mousetrap.bind(['p'], function(e){
+    e.preventDefault();
+    $('#wiki-page-finder').modal();
+    return false;
+  });
+
+  var pages = [
+    { 'title': "This is first h1", 'path': "path/to/file.md",
+      'wikipath': 'wiki/about',
+      'sections': [
+        {'section': "This is first h1", 'level': 1},
+        {'section': "This is first h2", 'level': 2}
+      ],
+      'version': 'sha',
+      'created': {
+        'author': {
+          'username': 'xyz',
+          'name': 'Xy Z',
+          'mail': 'xyz@domain.tld'
+        }
+      },
+      'wikilinks': [
+        {'ref': '/wiki/about/anotherpage.md'}
+      ]
+    },
+    {
+      'title': "Another headline",
+      'path': 'path/to/other_file.md',
+      'wikipath': 'wiki/about'
+    }
+  ];
+
+  //
+
+  var pageMatcher = function(pageInfo) {
+    return function findMatches(q, cb) {
+      var matches = [];
+      console.log("query", q);
+      cb(pages);
+    };
+  };
+
+  var highlight = function(o) {
+    // o.node, o.pattern
+    //o.caseSensitive, o.wordsOnly
+    // o.className
+  }
+
+
+  $('#wiki-page-finder .typeahead').typeahead({
+    hint: true,
+    minLength: 0
+  }, {
+    name: 'pages',
+    source: pageMatcher(pages),
+    display: function(o) {
+      console.log("display o", o);
+      return o.title },
+    templates: {
+      suggestion: function(o) {
+        console.log("o", o);
+        return "<div><div>"+o.title+"</div><div>"+o.path+"</div></div>"
+      }
+    }
+  });
+});
+</script>
+<style>
+  #wiki-page-finder .modal-content {
+    position: relative;
+  }
+  #wiki-page-finder span.twitter-typeahead {
+    width: 100%;
+  }
+  #wiki-page-finder.modal .tt-menu {
+    background: white;
+    width: 100%;
+  }
+</style>
+
+<div id="wiki-page-finder" class="modal" tabindex="-1" role="dialog" aria-labelledby="pageFinder">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- <div class="modal-header">
+      </div> -->
+      <div class="modal-body">
+        <input id="wiki-page-finder-input" class="typeahead form-control" type="text" placeholder="Find Page">
+      </div>
+    </div>
+  </div>
+</div>

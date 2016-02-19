@@ -187,19 +187,21 @@ module GollumCaves
     end
 
     def list_collections()
-      Dir.entries(@root).each do |entry|
-        next if entry[0] == "."
-        next unless File.directory?(File.join(@root, entry))
-        entry
+      Dir.entries(@root).select do |entry|
+        next false if entry[0] == "."
+        next false unless File.directory?(File.join(@root, entry))
+        true
       end
     end
 
     def list_wikis(collection)
-      Dir.entries(File.join(@root, collection)).each do |entry|
-        next if entry[0] == "."
-        next unless File.directory?(File.join(@root, collection, entry))
+      Dir.entries(File.join(@root, collection)).select do |entry|
+        next false if entry[0] == "."
+        next false unless File.directory?(File.join(@root, collection, entry))
+        entry = entry.gsub(/\.git$/, '')
+        exists? collection, entry
+      end.map do |entry|
         entry.gsub(/\.git$/, '')
-        next unless exists? entry
       end
     end
 
@@ -235,7 +237,7 @@ module GollumCaves
       options = {
         :mathjax => true,
         :filter_chain =>
-          [:FrontMatter, :MustachePreProcessor, :PlainText, :RemoteCode, :Code, :Macro, :MustachePostProcessor, :Tags, :Render],
+          [:FrontMatter, :ProcessHeadlines, :MustachePreProcessor, :PlainText, :RemoteCode, :Code, :Macro, :MustachePostProcessor, :Tags, :Render],
         :allow_uploads => true,
         :per_page_uploads => true,
         :ref => 'master',
@@ -330,16 +332,21 @@ module GollumCaves
     # Public: expand path into collection, wikiname and path
     def split_wiki_path(path)
       if path == "/"
-        cn, wn, pn = @default_coll_name, @default_wiki_name, "/"
+        [ @default_coll_name, @default_wiki_name, "/" ]
       else
         path = path[1..-1] if path[0] == '/'
+        path = path[0..-2] if path[-1] == '/'
+        path = path.gsub(%r{//+}, '/')
 
         cn, wn, pn = path.split('/', 3)
-        pn = '/' if pn.nil? or pn.empty?
-#        pn = '/'+pn if pn[0] != '/'
-        wn = @default_wiki_name if wn.nil? or wn.empty?
+        if wn.nil?
+          [ cn, @default_wiki_name, "/" ]
+        elsif pn.nil?
+          [ cn, wn, "/" ]
+        else
+          [ cn, wn, pn ]
+        end
       end
-      [ cn, wn, pn ]
     end
 
     # Public: expand path into wikipath and path

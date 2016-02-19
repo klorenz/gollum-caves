@@ -54,13 +54,21 @@ module GollumCaves
     #
     def wikifile(path, version=nil)
       log_info "wikifile: #{path}, #{version}"
-      path = Gollum::Page.cname(path.gsub('+', '-'))
+      path = Gollum::Page.cname(path)
+
       ext = File::extname(path)
       if ext == ''
-        path = path+'.md'
-      end
+        name = File.basename(path)
+        dir  = File.dirname(path)
 
-      WikiFile.find(self, path, version)
+        if page = @wiki.paged(name, dir, version)
+          WikiFile.find(self, page.filename, version)
+        else
+          WikiFile.path = path+'.md'
+        end
+      else
+        WikiFile.find(self, path, version)
+      end
     end
 
     def wikifile_exists?(path, version=nil)

@@ -3,9 +3,11 @@ require 'gollum/views/edit'
 module Precious
   module Views
     class Edit
-      attr_reader :editor
       def editor_setup
         "#{@editor}_setup"
+      end
+      def editor_view
+        @editor
       end
       attr_reader :filename
       attr_reader :wikicoll

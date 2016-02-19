@@ -115,6 +115,8 @@ module Precious
 
       @wm = GollumCaves::WikiManager.new(wiki_dir)
       @wm.init()
+
+      log_debug("path_info: #{request.path_info}")
     end
 
         private
@@ -185,6 +187,7 @@ end
 require 'gollum-caves/app/base'
 require 'gollum-caves/app/user'
 require 'gollum-caves/app/create'
+require 'gollum-caves/app/edit'
 require 'gollum-caves/app/routes'
 
 require 'gollum-caves/config'

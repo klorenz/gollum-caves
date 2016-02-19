@@ -30,13 +30,33 @@
     <![endif]-->
 
     <script src="{{base_url}}/javascript/jquery.min.js"></script>
+    <script src="{{base_url}}/javascript/mousetrap.min.js"></script>
     <script src="{{base_url}}/javascript/bootstrap.min.js"></script>
+    <script src="{{base_url}}/javascript/typeahead-highlight.jquery.js"></script>
 
     {{>editor_setup}}
 
     {{#plugins}}
       {{>plugin_setup}}
     {{/plugins}}
+
+    <style>
+    .wiki-logo-small {
+      background-image: url('{{base_url}}/images/gollum-caves-logo.svg');
+      background-size: contain;
+      height: 40px;
+      width: 40px;
+      display: inline-block;
+      margin-top: -10px;
+    }
+    </style>
+
+    <script>
+    // activate bootstrap tooltips
+    $(function() {
+        $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+    });
+    </script>
 
   </head>
   <body>

@@ -39,55 +39,6 @@ module Precious
 
     end
 
-    get '/edit/*' do
-      forbid unless @allow_editing
-      wikip        = wiki_page(params[:splat].first)
-      @name        = wikip.name
-      @filename    = wikip.name
-      @path        = wikip.path
-      @upload_dest = find_upload_dest(@path)
-
-      ext = ::File.extname(@name)
-
-      if ext == ".md" or ext.empty?
-        @editor = "markdown"
-      elsif ext == ".svg"
-        @editor = "svg"
-      # if is textfile
-      elsif wikip.name.match(/\.(txt|rst|css|less|js|coffee|c|cpp|cxx|h|hpp|hxx)$/)
-        @editor = "source"
-      else
-        @editor = "upload"
-      end
-      wiki = wikip.wiki
-
-      puts "edit 2 name #{@name}, path #{@path}, ext #{ext}, editor: #{@editor}, wikip.filepath #{wikip.filepath}"
-      file = wiki.file(wikip.filepath, wiki.ref, false)
-      puts "edit 2 file: #{file}"
-
-      @redirect_url = request.referer
-
-      if page = wikip.page
-        @page         = page
-        @page.version = wiki.repo.log(wiki.ref, @page.path).first
-        @content      = page.text_data
-        mustache :edit
-      elsif file = wiki.file(wikip.filepath, wiki.ref, false)
-        ext = ::File.extname(wikip.filepath)
-        if @editor_svg
-          @page = file
-          @title = wikip.name
-          @content = file.raw_data
-          @page.version = wiki.repo.log(wiki.ref, @page.path).first
-          mustache :edit
-        else
-          @editor_upload = true
-          mustache :edit
-        end
-      else
-        redirect to("/create/#{encodeURIComponent(@name)}")
-      end
-    end
 
     get '/wiki-create/:coll/:wiki' do
       #wiki_manager
@@ -108,50 +59,6 @@ module Precious
     end
 
 
-    post '/edit/*' do
-      path      = '/' + clean_url(sanitize_empty_params(params[:path])).to_s
-      wikipath  = params[:wikipath].to_s
-      page_name = CGI.unescape(params[:page])
-
-      puts "post edit path #{path}, page_name #{page_name}, wikipath #{wikipath}"
-      puts "post pagepath #{wikipath}#{path}"
-
-      wikip     = wiki_page(page_name, wikipath+path, nil, exact = true)
-      wiki      = wikip.wiki
-      page      = wikip.page
-
-      if page.nil?
-        file = wiki.file(wikip.filepath, )
-        return if file.nil?
-
-        committer = Gollum::Committer.new(wiki, commit_message)
-        commit = { :committer => committer }
-        puts "post edit path #{wikip.path}, page_name #{wikip.name}, wikipath #{params[:format]}"
-        update_wiki_page(wiki, file, params[:content], commit, wikip.name, params[:format])
-        committer.commit
-
-        if not params[:redirect].nil?
-          redirect_url = params[:redirect]
-        else
-          redirect_url = "/#{wikip.filepath}"
-        end
-
-        puts("redirect_url: #{redirect_url}")
-
-        redirect to(redirect_url)
-      else
-        committer = Gollum::Committer.new(wiki, commit_message)
-        commit    = { :committer => committer }
-
-        update_wiki_page(wiki, page, params[:content], commit, page.name, params[:format])
-        update_wiki_page(wiki, page.header, params[:header], commit) if params[:header]
-        update_wiki_page(wiki, page.footer, params[:footer], commit) if params[:footer]
-        update_wiki_page(wiki, page.sidebar, params[:sidebar], commit) if params[:sidebar]
-        committer.commit
-      end
-
-      redirect to("/#{@wikipath}/#{page.escaped_url_path}") unless page.nil?
-    end
 
     get '/fileview/:coll/:wiki' do
       wiki     = wiki_new(params[:coll], params[:wiki])
@@ -249,9 +156,9 @@ module Precious
       show_page_or_file2(params[:splat].first)
     end
 
-    get '/*' do
-      show_page_or_file(params[:splat].first)
-    end
+    # get '/*' do
+    #   show_page_or_file(params[:splat].first)
+    # end
 
 
     # get '/view/:collname/:wikiname/*' do

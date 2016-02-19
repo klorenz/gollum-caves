@@ -9,7 +9,9 @@ module Precious
       def page_dir
         @path.gsub(/\/#{@wikipath}/, '')
       end
-      attr_reader :editor
+      def editor_view
+        @editor
+      end
       attr_reader :filename
       #attr_reader :collname
       attr_reader :wikicoll

@@ -228,3 +228,24 @@ http://blog.netgusto.com/tag/wysiwyg/
 
 | foo | bar |
 |-----|-----|
+
+## Page _Header
+
+PageName Revision
+OrganizationalUnit  Geltungsbereich
+Creator Responsible Verifier ReleaseDate
+
+
+## time machine mode
+
+- need a badge (which you can escape by clicking the x), which states
+  range the version of commit, the timerange from commit till next
+  commit.  Then everything is running in that version.
+
+## PUBLIC Cache
+
+- public files must have
+
+## publishing workflow
+
+Use standard tagging mechanism v0.0.1 etc, for publishing.

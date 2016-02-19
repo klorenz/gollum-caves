@@ -51,8 +51,9 @@ class Mustache
         break
       rescue
         if respond_to? name
-            name = public_send(name)
-            retry
+          log_debug("read name from variable: name=#{name}")
+          name = public_send(name)
+          retry
         end
 
         raise if raise_on_context_miss?
@@ -75,73 +76,14 @@ end
 
 
 require 'mustache'
-
-class MarkdownMustache < Mustache
-  def command
-  end
-end
-
-class MarkdownMustachePre < MarkdownMustache
-  def puml
-  end
-end
-
-class MarkdownMustachePost < MarkdownMustache
-end
-
 require 'gollum-lib/filter'
+require 'gollum-lib/filter/tags'
 
-class Gollum::Filter::FrontMatter < Gollum::Filter
-  def extract(data)
-    data.gsub(/^---\n(.*?\n)---\n/) do
-      @markup.metadata ||= {}
-      @markup.metadata = @markup.metadata.merge(YAML.load(Regexp.last_match[1]))
-    end
+require 'gollum-caves/filter/frontmatter'
+require 'gollum-caves/filter/mustache_processors'
+require 'gollum-caves/filter/process_headlines'
 
-    # data.gsub(/^```-yaml\n(.*)^```\n/m) do
-    #   @markup.metadata ||= {}
-    #   @markup.metadata = @markup.metadata.merge(YAML.load(Regexp.last_match[2]))
-    #   ''
-    # end
-  end
-
-  def process(data)
-    head = ""
-    if @markup.metadata
-      head = "<script>var METADATA = #{JSON.generate(@markup.metadata)}</script>\n"
-    end
-    head + data
-  end
-end
-
-class Gollum::Filter::MustachePreProcessor < Gollum::Filter
-    # embrace the code with {{=<< >>=}}
-    # and process only <<#foo>> ... <</foo>> tags which are assumed to
-    # produce markdown code.
-    def extract(data)
-      template = "{{=<< >>=}}\n#{data}"
-
-      MarkdownMustachePre.render template, @markup.metadata
-    end
-
-    def process(data)
-      data
-    end
-
-    # in this stage process {{...}} tags, which are assumed to produce
-    # HTML
-end
-
-class Gollum::Filter::MustachePostProcessor < Gollum::Filter
-    def extract(data)
-        data
-    end
-
-    # in this stage process {{...}} tags, which are assumed to produce
-    # HTML
-    def process(data)
-      MarkdownMustachePost.render data, @markup.metadata
-    end
+class Gollum::Filter::Tags
 end
 
 Precious::App.set(:default_markup, :markdown) # set your favorite markup language
@@ -155,6 +97,7 @@ Precious::App.set(:wiki_options, {
         #[:FrontMatter, :Metadata, :PlainText, :GollumCavesPlugins, :TOC, :RemoteCode, :Code, :Macro, :Sanitize, :Tags, :Render],
         #[:FrontMatter, :MustachePreProcessor, :PlainText, :TOC, :RemoteCode, :Code, :Macro, :MustachePostProcessor, :Sanitize, :Tags, :Render],
       #  [:FrontMatter, :MustachePreProcessor, :PlainText, :TOC, :RemoteCode, :Code, :Macro, :MustachePostProcessor, :Tags, :Render],
+
         [:FrontMatter, :PlainText, :TOC, :RemoteCode, :Code, :Macro, :Tags, :Render],
 
 #    :css => true,
