@@ -8,9 +8,14 @@
         <div id="navbar" class="navbar-collapse collapse">
           {{>navbar_wikiselection}}
 
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="#"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> <u>c</u>ancel</a></li>
-          </ul>
+          <div class="nav navbar-nav navbar-right">
+            <a href="{{redirect_url}}"><span
+              data-toggle="tooltip" data-placement="bottom"
+              title="cancel edit and view page"
+              class="btn btn-default navbar-btn"><span
+                class="glyphicon glyphicon-remove"
+                aria-hidden="true"></span></span></a>
+
         </div><!--/.nav-collapse -->
       </div>
     </nav>
@@ -23,9 +28,9 @@
     <h1 class="wiki-page-title">Create New Page</h1>
 
     <div style="margin-bottom: 2rem">
-      <div class="input-group" data-toggle="tooltip" data-placement="bottom" title="Enter here the page name, path may be included">
-        <span class="input-group-addon" id="page-name-addon"><span class="glyphicon glyphicon-file"></span> {{page_dir}}/</span>
-        <input id="page-name" type="text" class="form-control" placeholder="{{page_name}}" aria-describedby="page-name-addon" value="">
+      <div class="input-group">
+        <span class="input-group-addon" id="page-name-addon" data-toggle="tooltip" data-placement="bottom" title="Your page will be created in {{page_dir}}/"><span class="glyphicon glyphicon-file"></span> {{page_dir}}/</span>
+        <input id="page-name" type="text" class="form-control" placeholder="{{page_name}}" aria-describedby="page-name-addon" value="" data-toggle="tooltip" data-placement="bottom" title="Enter here the page name.  You can include folder path separated with '/'">
       </div>
     </div>
 
@@ -44,19 +49,3 @@
     $("#page-name").focus();
   });
 </script>
-
-<!--
-<div id="wiki-wrapper" class="create">
-<div id="head">
-  <h1>Create New Page</h1>
-</div>
-<div id="wiki-content" class="create edit">
-  <div class="has-sidebar">
-    {{>editor}}
-  </div>
-</div>
-</div>
-<script type="text/javascript">
-var default_markup = '{{default_markup}}';
-</script>
-{{something}} -->

@@ -10,5 +10,7 @@ module GollumCaves
       name, format = Gollum::Page.parse_filename(File.basename(path))
       [dir, name, format]
     end
+
+
   end
 end

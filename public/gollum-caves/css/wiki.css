@@ -6,6 +6,39 @@ body {
   color: #555;
 }
 
+/* nicer wiki-nav dropdown look */
+.wiki-nav .dropdown {
+  border: 1px solid rgba(0, 0, 0, 0.0);
+}
+
+.wiki-nav .dropdown.open {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.2rem;
+}
+
+.wiki-nav .dropdown > a:first-child {
+  padding-left: 1rem;
+}
+.wiki-nav .dropdown > a:last-child {
+  padding-right: 1rem;
+}
+
+/* override collapsed navbar button bar, for left margin */
+.navbar-collapse .nav.navbar-nav {
+  margin-left: 0;
+}
+
+/* override bootstrap's caret and make it resizeable */
+.caret {
+  border-width: 0.5rem;
+}
+
+/* make search bar resizable */
+form.navbar-form #gollum-caves-navbar-search {
+  width: 100%;
+  height: 100%;
+}
+
 h1, .h1,
 h2, .h2,
 h3, .h3,

@@ -1,7 +1,5 @@
 require 'gollum-caves/logging'
 
-
-
 module GollumCaves
   class WikiFile
     include GollumCaves::FileNameMixin
@@ -30,6 +28,41 @@ module GollumCaves
       end
     end
 
+    def self.editor_for(thing)
+      if thing.respond_to? 'editor'
+        thing.editor
+      else
+        if thing.is_a? Symbol
+          fmt = Gollum::Page.format_for("foo.#{thing}")
+        else
+          fmt = Gollum::Page.format_for(thing)
+        end
+        if fmt.nil?
+          "editor_source"
+
+        # somehow check if is_binary
+        else
+          "editor_#{fmt}"
+        end
+      end
+    end
+
+    def editor
+      if is_binary?
+        "editor_upload"
+      else
+        WikiFile.editor_for(@path)
+      end
+    end
+
+    def content
+      if page = as_page
+        page.text_data
+      else
+        raw_data
+      end
+    end
+
     def extension
       @ext ||= File.extname(filename)
     end
@@ -44,6 +77,21 @@ module GollumCaves
       else
         @path
       end
+    end
+
+    def url_path
+      make_url_path(@path)
+      path = if @path.include?('/')
+          @path.sub(/\/[^\/]+$/, '/')
+        else
+          ''
+        end
+      path << Gollum::Page.cname(name)
+      path
+    end
+
+    def escaped_url_path
+      CGI.escape(url_path).gsub('%2F', '/')
     end
 
     def name
@@ -91,6 +139,10 @@ module GollumCaves
       log_debug "raw_data #{@blob.data}"
 
       @blob.data
+    end
+
+    def is_binary?
+      raw_data =~ /\0/
     end
 
     # Public: Class method to find a path in wiki and return corresponding WikiFile object

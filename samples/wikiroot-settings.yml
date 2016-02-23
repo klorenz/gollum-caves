@@ -1,0 +1,67 @@
+main_coll_name:
+  value:
+    wiki
+  description:
+    Name of main collection.  You will usually call it `wiki`.
+
+default_wiki_name:
+  value:
+    <meta-setting>
+  description:
+    This is the default landing wiki if go do not specify a wiki name.
+
+    If it is set to `<meta-setting>`, this is read from settings file
+    from meta wiki.  As long the default wiki is not configured, you
+    will be redirected into configuration wizard to do so.
+
+default_coll_name:
+  value:
+    <meta-setting>
+  description:
+    This is the default landing wiki if go do not specify a coll name
+
+    If it is set to `<meta-setting>`, this is read from settings file
+    from meta wiki.
+
+use_bare_repos:
+  value:
+    false
+  description:
+    This specifies if you want to use bare repos.  You should this only use
+    on servers, where you might want to push to.
+
+meta_wiki_name:
+  value:
+    about
+  description:
+    Name of the meta wiki, which contains settings and
+    informations about a collection.  Meta Wiki of main
+    collections contains defaults for all collections and
+    wikis.
+
+plugin_coll_name:
+  value:
+    wiki-plugins
+  description:
+    Name of plugin collection.  This is the collection of
+    plugins used.
+
+settings_page_path:
+  value:
+    Settings.md
+  description:
+    Path of settings file relative to repo root.  This file is used
+    for settings in meta wikis and wikis.
+
+default_committer_name:
+  value:
+    Gollum
+  description:
+    Name of default_committer.  This is used from the system for internal
+    commits.
+
+default_committer_mail:
+  value:
+    gollum@middle.earth
+  description:
+    Email of default_committer.  It should be a real email address.

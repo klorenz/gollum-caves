@@ -8,8 +8,8 @@
 </style>
 
   <ul class="nav nav-tabs" id="gollum-caves-editor-tabs">
-    <li role="presentation" class="active" data-target="gollum-caves-ckeditor" data-textarea="ckeditor-body"><a href="#">WYSIWYG</a></li>
-    <li role="presentation" data-target="gollum-caves-side-by-side" data-textarea="code"><a href="#">Markdown Side-By-Side</a></li>
+    <li role="presentation" class="active" data-target="gollum-caves-ckeditor" data-textarea="ckeditor-body" data-toggle="tooltip" title="edit what you see is what you get"><a href="#">WYSIWYG</a></li>
+    <li role="presentation" data-target="gollum-caves-side-by-side" data-textarea="code" data-toggle="tooltip" title="edit source with responsive client side preview"><a href="#">Markdown Side-By-Side</a></li>
   </ul>
 
   <div id="gollum-caves-tab-items">
@@ -19,8 +19,12 @@
     </div>
 
     <div id="gollum-caves-side-by-side" class="tab-item form-group">
-      <div id="in"><textarea id="codemirror-body">{{content}}</textarea></div>
-      <div id="out"></div>
+      <div>
+        <div>
+          <div id="in"><textarea id="codemirror-body">{{content}}</textarea></div>
+          <div id="out"></div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -38,6 +42,9 @@
   <input type="hidden" name="page" id="gollum-editor-page-title" value="{{page_name}}">
   <input type="hidden" name="path" id="gollum-editor-page-path" value="{{page_dir}}">
   <input type="hidden" name="wikipath" id="gollum-editor-page-path" value="{{wikipath}}">
+  {{#has_redirect_url}}
+    <input type="hidden" name="redirect_url" id="gollum-editor-page-path" value="{{redirect_url}}">
+  {{/has_redirect_url}}
 
   <textarea id="gollum-editor-body" name="content" style="display: none">{{content}}</textarea>
 

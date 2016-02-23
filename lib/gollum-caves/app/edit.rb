@@ -18,15 +18,8 @@ module Precious
         @path         = wikifile.dir
         @upload_dest  = wikifile.filename.gsub(/\.[^.]+$/, '')
 
-        if page = wikifile.as_page
-          @editor = "editor_#{page.format}"
-          @content = page.text_data
-        elsif wikifile.is_binary?
-          @editor = 'editor_upload'
-        else
-          @editor = 'editor_source'
-          @content = wikifile.raw_data
-        end
+        @editor = wikifile.editor
+        @content = wikifile.content
 
         log_debug("editor: #{@editor}")
 

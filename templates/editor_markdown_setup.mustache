@@ -1,62 +1,62 @@
 <style>
-    .CodeMirror pre{
-      line-height: 16px;
-    }
-
-    #gollum-caves-tab-items #gollum-caves-side-by-side {
+    /* keep the vertical space for the following absolute positioned block */
+    #gollum-caves-side-by-side {
+      {{#is_create_page}}
+      height: 57vh;
+      {{/is_create_page}}
+      {{^is_create_page}}
       height: 60vh;
-      position: relative;
-    }
-￼
-    #in {
-      width: 50%;
-      height: 100%;
-      overflow: auto;
-      font-size: 12px;
-      box-shadow: 2px 1px 3px 1px rgba(0,0,0,0.4);
-      min-width: 60rem;
-      display: inline-block;
-      position: relative;
+      {{/is_create_page}}
     }
 
-/*
-    #in{
+    /* for horizontally centering the child's div */
+    #gollum-caves-side-by-side > div {
       position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 50%;
-      height: auto;
-      overflow: auto;
-      font-size: 12px;
-      box-shadow: 2px 1px 3px 1px rgba(0,0,0,0.4);
-    }
-*/
-    .CodeMirror {
-      position: absolute;
-      top: 0;
+      {{#is_create_page}}
+      height: 57vh;
+      {{/is_create_page}}
+      {{^is_create_page}}
+      height: 60vh;
+      {{/is_create_page}}
       left: 0;
       right: 0;
+      text-align: center;
+    }
+
+    #gollum-caves-side-by-side > div > div {
+      height: 100%;
+      position: relative;
+      min-width: 120rem;
+      width: 50%;
+      display: inline-block;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+
+    #in {
+      position: absolute;
+      top: 0;
+      left: 0;
       bottom: 0;
-      width: auto;
+      width: 50%;
       height: auto;
-    }
-
-    .CodeMirror-scroll {
-      padding: 1em;
-      box-sizing: border-box;
-    }
-
-    .CodeMirror-vscrollbar, .CodeMirror-hscrollbar {
-      background-color: #F0F0F0;
+      overflow: auto;
+      font-size: 12px;
+      box-shadow: 2px 1px 3px 1px rgba(0, 0, 0, 0.4);
     }
 
     #out {
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 50%;
+      bottom: 0;
       overflow: auto;
       padding: 10px;
       padding-left: 20px;
       color: #444;
-      font-family:Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
+      font-family: Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
       font-size: 16px;
       line-height: 1.5em;
       border-top: 1px solid rgba(0,0,0,0.1);
@@ -64,34 +64,7 @@
       border-bottom: 1px solid rgba(0,0,0,0.1);
       border-bottom-right-radius: 0.2em;
       border-top-right-radius: 0.2em;
-      display: inline-block;
-      min-width: 60rem;
-      position: relative;
-      width: 50%;
-      height: 100%;
     }
-
-    /*
-      #out{
-        position: absolute;
-        top: 0;
-        right: 0;
-        left: 50%;
-        bottom: 0;
-        overflow: auto;
-        padding: 10px;
-        padding-left: 20px;
-        color: #444;
-        font-family:Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
-        font-size: 16px;
-        line-height: 1.5em;
-        border-top: 1px solid rgba(0,0,0,0.1);
-        border-right: 1px solid rgba(0,0,0,0.1);
-        border-bottom: 1px solid rgba(0,0,0,0.1);
-        border-bottom-right-radius: 0.2em;
-        border-top-right-radius: 0.2em;
-      }
-    */
 
     .emoji {
       width: 1em;

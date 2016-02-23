@@ -189,6 +189,7 @@ require 'gollum-caves/app/user'
 require 'gollum-caves/app/create'
 require 'gollum-caves/app/edit'
 require 'gollum-caves/app/routes'
+require 'gollum-caves/app/view'
 
 require 'gollum-caves/config'
 require 'gollum-caves/bootstrap'

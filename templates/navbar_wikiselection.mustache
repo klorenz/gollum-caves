@@ -1,21 +1,17 @@
 <span class="navbar-nav navbar-left navbar-text wiki-nav">
   <span class="dropdown">
-    <a href="{{base_url}}/view/{{wikicoll}}/" data-toggle="tooltip" data-placement="bottom" title="go to {{wikicoll}} collection">{{wikicoll}}</a><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="caret" aria-hidden="true"></span></a>
-    <ul class="dropdown-menu">
+    <a href="{{base_url}}/view/{{wikicoll}}/" data-toggle="tooltip" data-placement="bottom" title="go to {{wikicoll}} collection">{{wikicoll}}</a><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="caret" aria-hidden="true"></span></a><ul class="dropdown-menu">
       {{#other_collections_list}}
       <li><a href="{{base_url}}/view/{{name}}/">{{name}}</a></li>
       {{/other_collections_list}}
-    </ul>
-  </span>
+    </ul></span>
 
   <span>/</span>
 
   {{#has_other_wikis}}
   <span class="dropdown">
     <a href="{{base_url}}/view/{{wikicoll}}/{{wikiname}}/">{{wikiname}}</a>
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-      <span class="caret" aria-hidden="true"></span>
-    </a>
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="caret" aria-hidden="true"></span></a>
     <ul class="dropdown-menu">
       {{#other_wikis_list}}
       <li><a href="{{base_url}}/view/{{name}}/">{{name}}</a></li>

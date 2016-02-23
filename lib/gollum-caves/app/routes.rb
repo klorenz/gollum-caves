@@ -150,37 +150,5 @@ module Precious
 
     end
 
-
-
-    get '/view/*' do
-      show_page_or_file2(params[:splat].first)
-    end
-
-    # get '/*' do
-    #   show_page_or_file(params[:splat].first)
-    # end
-
-
-    # get '/view/:collname/:wikiname/*' do
-    #   collname = params[:collname]
-    #   wikiname = params[:wikiname]
-    #   filepath = params[:splat].first
-    #
-    #   render_wikifile(collname, wikiname, filepath)
-    # end
-    #
-    # def render_wikifile(collname, wikiname, filepath)
-    #   wikifile = @wm.wiki(collname, wikiname).wikifile(filename)
-    #   if page = wikifile.as_page()
-    #     @page = page
-    #     @name = wikifile.name
-    #     @content = page.formatted_data
-    #     @upload_dest = find_upload_dest(filepath)
-    #     @editable    = true
-    #     @page_exists = !page.versions.empty?
-    #     mustache :page
-    #   end
-    #     #@toc_content = @
-    # end
   end
 end

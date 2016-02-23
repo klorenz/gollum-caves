@@ -11,10 +11,13 @@ module Precious
       end
       attr_reader :filename
       attr_reader :wikicoll
-      attr_reader :collname
       attr_reader :wikiname
       attr_reader :wikipath
       attr_reader :redirect_url
+
+      def has_redirect_url
+        not @redirect_url.nil?
+      end
     end
   end
 end

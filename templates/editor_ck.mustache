@@ -24,7 +24,12 @@
             { name: 'about', groups: [ 'about' ] }
           ],
 
+          {{#is_create_page}}
+          height: '50vh',
+          {{/is_create_page}}
+          {{^is_create_page}}
           height: '55vh',
+          {{/is_create_page}}
 
           removeButtons: 'Source,Save,NewPage,Preview,Print,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Flash,Smiley,PageBreak,Iframe,Styles,Font,FontSize,TextColor,BGColor'
 
