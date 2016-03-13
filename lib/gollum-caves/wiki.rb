@@ -164,6 +164,8 @@ module GollumCaves
             end
           end
         end
+
+        @wiki_manager.add_to_index(@wiki, index, sha, files)
       end
 
       sha = committer.commit

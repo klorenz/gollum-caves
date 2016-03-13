@@ -14,7 +14,7 @@ module Precious
         wn, cn, @path = @wm.split_wiki_path @filename
         @path = File.dirname(@path).sub(/^\./, '')
 
-        wiki = @wm.wiki(wn, cn)
+        @wiki = @wm.wiki(wn, cn)
 
         if @format.empty?
           @format = Gollum::Page.format_for(@filename)
@@ -31,12 +31,8 @@ module Precious
         end
 
         @editor = GollumCaves::WikiFile.editor_for(@format)
-        @allow_uploads = wiki.allow_uploads
+        @allow_uploads = @wiki.allow_uploads
         @upload_dest   = find_upload_dest(@path)
-
-        @wikiname = wiki.wikiname
-        @wikicoll = wiki.collname
-        @wikipath = wiki.wikipath
 
         mustache :create
       end

@@ -5,6 +5,10 @@ module GollumCaves
     attr_reader :mail
     attr_reader :roles
 
+    def groups
+      @roles
+    end
+
     def initialize(username: nil, name: nil, mail: nil, roles: nil)
       @username = username
       @name = name

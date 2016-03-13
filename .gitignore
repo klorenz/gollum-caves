@@ -3,3 +3,7 @@
 /wiki
 /wiki-templates
 /node_modules
+/bower_components
+/tmp
+/sketches
+.tags*

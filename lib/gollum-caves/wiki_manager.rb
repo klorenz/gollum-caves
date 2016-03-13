@@ -9,7 +9,7 @@ require 'grit_adapter/git_layer_grit'
 require 'pathname'
 require 'find'
 
-# TODO: create cache for wiki settings
+# TODO:110 create cache for wiki settings
 
 module GollumCaves
   class Sanitization < Gollum::Sanitization
@@ -99,7 +99,7 @@ module GollumCaves
         log_info "created wiki-plugins collection"
       end
 
-      # TODO: this might be done in meta_coll settings configuration rather than system config
+      # TODO:140 this might be done in meta_coll settings configuration rather than system config
 
       if not exists_collection? @default_coll_name
         if @default_coll_name != '<meta-setting>'
@@ -264,7 +264,7 @@ module GollumCaves
       @wiki_cache[wikipath] = Wiki.new(self, gollum_wiki, collection, name)
     end
 
-    # TODO: Do this with Gollum::Repo.init_bare() and ...init()
+    # TODO:20 Do this with Gollum::Repo.init_bare() and ...init()
 
     def create_wiki(collection, wiki=nil, opts={})
       collection, wiki = get_coll_wiki_names(collection, wiki)
@@ -319,7 +319,7 @@ module GollumCaves
     #
     # returns true on success
     def fork_wiki(source, destination)
-      # TODO: consider --bare
+      # TODO:100 consider --bare
       `git clone "#{@root}/#{source}" "#{@root}/#{destination}"`
       $?.exitstatus == 0
     end
@@ -446,5 +446,14 @@ module GollumCaves
 
       File.write farm_settings_file, YAML.dump(settings)
     end
+
+    # Public: add pages and files to elasticsearch index
+    def add_to_index(wiki, index, sha, files)
+    end
+
+    # Public: find pages in elastic search index
+    def search(user, query, collection, wiki)
+    end
+
   end
 end

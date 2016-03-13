@@ -14,6 +14,7 @@ module Precious
       mustache :latest_changes
     end
 
+
     # get wikifarm information /<collection>/<name> and melt down path_info
     # before '/:coll/:name/*' do
     #   if params[:coll] != "javascript" and params[:coll] != "css" and params[:coll] != "gollum-caves"

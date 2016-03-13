@@ -1,8 +1,13 @@
 require 'gollum/views/create'
+require 'gollum-caves/view_wiki_mixin'
 
 module Precious
   module Views
     class Create
+      include GollumCaves::ViewWikiMixin
+
+      attr_reader :filename
+
       def editor_setup
         "#{@editor}_setup"
       end
@@ -14,14 +19,12 @@ module Precious
         @path.gsub(/\/#{@wikipath}/, '')
       end
 
-      attr_reader :filename
-      attr_reader :wikicoll
-      attr_reader :wikiname
-      attr_reader :wikipath
       def has_redirect_url
         not @redirect_url.nil?
       end
+
       attr_reader :redirect_url
+
 
     end
   end

@@ -249,3 +249,32 @@ Creator Responsible Verifier ReleaseDate
 ## publishing workflow
 
 Use standard tagging mechanism v0.0.1 etc, for publishing.
+
+
+# one of the principals is extendability
+
+- it must be easy to add a new file format to system
+
+- have a command for building the public folder from the plugins and the gollum-caves
+  public folder
+
+# The wiki structure:
+
+You have files.  You can have two types of storage:
+
+- If there is a file foo.md, you store attachments, comments, etc. to this page in folder foo/.
+  Comments could be stored to comments.yml
+
+- You could also store comments in page's frontmatter and store attachments wherever you like
+  and you reference them in frontmatter.
+
+
+## Development
+
+Bower is needed for development.  Bower packages are installed into 
+`bower_components/`, and then installed into `public/`, by running `make update-public`, which 
+is completely versioned.
+
+It is intended that system is runnable with `bundle install`, `bundle update` and 
+`bundle exec rackup config.ru`.
+

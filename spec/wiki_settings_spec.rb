@@ -71,7 +71,10 @@ end
 describe "GollumCaves::WikiSettings" do
   before do
     @tmpdir = Dir.mktmpdir
-    @wm = GollumCaves::WikiManager.new(@tmpdir) @wm.init() @coll = "user" @wiki = "felix"
+    @wm = GollumCaves::WikiManager.new(@tmpdir)
+    @wm.init()
+    @coll = "user"
+    @wiki = "felix"
     @wm.create_collection(@coll)
     @wm.create_wiki(@coll, @wiki)
   end

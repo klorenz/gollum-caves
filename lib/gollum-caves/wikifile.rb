@@ -6,6 +6,7 @@ module GollumCaves
     include GollumCaves::Logging
 
     def initialize(wiki, path, tree_entry, commit)
+
       @wiki = wiki
       @path = path
       @tree_entry = tree_entry
@@ -108,7 +109,7 @@ module GollumCaves
       more_metadata = opts[:metadata]
 
       metadata.deep_merge more_metadata
-      # write metadata using a writer depending on format
+      # TODO:150 write metadata using a writer depending on format
     end
 
     def method_missing(method, *args, &block)

@@ -52,7 +52,7 @@ module GollumCaves
         }
       end
 
-      # TODO: cache has to be cleaned up after a while
+      # TODO:90 cache has to be cleaned up after a while
       # store last access time?
       @@cache[key][:last_access] = Time.now()
       @@cache[key][:settings]
@@ -105,7 +105,7 @@ module GollumCaves
     #          :coll means coll overrides meta
     #          :meta means meta overrides coll overrides wiki overrides page
     #          :page means page overrides wiki overrides coll overrides meta
-    # version - TODO depending on policy this refers to corresponding wiki
+    # version - TODO:120 depending on policy this refers to corresponding wiki
     #           extract date and find version for this date for other wikis
     #
     def get(collname = nil, wikiname = nil, path = nil, policy = :wiki, version = nil, page_key = nil)

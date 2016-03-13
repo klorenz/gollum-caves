@@ -20,9 +20,9 @@ Precious::App.set(:gollum_caves, {
 })
 
 # limit to one format
-Gollum::Page::FORMAT_NAMES = {
-  :markdown => "Markdown"
-}
+# Gollum::Page::FORMAT_NAMES = {
+#   :markdown => "Markdown"
+# }
 
 
 # this is still original partial method, override this to search in

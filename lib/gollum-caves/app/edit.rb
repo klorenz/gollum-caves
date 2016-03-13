@@ -24,10 +24,9 @@ module Precious
         log_debug("editor: #{@editor}")
 
         @page = wikifile
+
         @title = wikifile.title
-        @wikicoll = wikifile.wiki.collname
-        @wikiname = wikifile.wiki.wikiname
-        @wikipath = wikifile.wiki.collname
+        @wiki = wikifile.wiki
 
         mustache :edit
       end
@@ -65,6 +64,8 @@ module Precious
           },
         )
       end
+
+      
     end
   end
 end
